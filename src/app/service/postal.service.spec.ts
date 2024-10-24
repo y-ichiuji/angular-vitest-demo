@@ -2,11 +2,9 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { PostalService } from './postal.service';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { of } from 'rxjs';
+import { vi } from 'vitest';
 
 describe('PostalService', () => {
   let service: PostalService;
@@ -25,7 +23,7 @@ describe('PostalService', () => {
   });
 
   it('should query address', fakeAsync(() => {
-    spyOn(httpClient, 'get').and.returnValue(
+    vi.spyOn(httpClient, 'get').mockReturnValueOnce(
       of({
         addresses: [
           {
@@ -45,13 +43,13 @@ describe('PostalService', () => {
     });
 
     tick();
-    expect(httpClient.get).toHaveBeenCalledOnceWith(
+    expect(httpClient.get).toHaveBeenCalledWith(
       'https://jp-postal-code-api.ttskch.com/api/v1/1000000.json'
     );
   }));
 
   it('should throw error when invalid post code', fakeAsync(() => {
-    spyOn(httpClient, 'get').and.returnValue(
+    vi.spyOn(httpClient, 'get').mockReturnValueOnce(
       of({
         addresses: [
           {

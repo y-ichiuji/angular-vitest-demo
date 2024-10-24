@@ -10,14 +10,15 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { PostalService } from '../../service/postal.service';
 import { of, throwError } from 'rxjs';
+import { vi } from 'vitest';
 
 describe('DemoComponent', () => {
   let component: DemoComponent;
   let fixture: ComponentFixture<DemoComponent>;
   let postalService: PostalService;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(fakeAsync(() => {
+    TestBed.configureTestingModule({
       imports: [DemoComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
@@ -26,7 +27,8 @@ describe('DemoComponent', () => {
     component = fixture.componentInstance;
     postalService = TestBed.inject(PostalService);
     fixture.detectChanges();
-  });
+    tick();
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -53,7 +55,9 @@ describe('DemoComponent', () => {
   }));
 
   it('should search address', fakeAsync(() => {
-    spyOn(postalService, 'queryAddress').and.returnValue(of('東京都千代田区'));
+    vi.spyOn(postalService, 'queryAddress').mockReturnValueOnce(
+      of('東京都千代田区')
+    );
 
     component.postCode.set('1000000');
     fixture.detectChanges();
@@ -63,13 +67,13 @@ describe('DemoComponent', () => {
     compiled.querySelector('button')?.click();
     tick();
 
-    expect(postalService.queryAddress).toHaveBeenCalledOnceWith('1000000');
+    expect(postalService.queryAddress).toHaveBeenCalledWith('1000000');
     expect(component.postCode()).toBe('1000000');
     expect(component.postAddress()).toBe('東京都千代田区');
   }));
 
   it('should handle error when search address', fakeAsync(() => {
-    spyOn(postalService, 'queryAddress').and.returnValue(
+    vi.spyOn(postalService, 'queryAddress').mockReturnValueOnce(
       throwError(() => new Error('Invalid post code'))
     );
 
@@ -81,7 +85,7 @@ describe('DemoComponent', () => {
     compiled.querySelector('button')?.click();
     tick();
 
-    expect(postalService.queryAddress).toHaveBeenCalledOnceWith('100000');
+    expect(postalService.queryAddress).toHaveBeenCalledWith('100000');
     expect(component.postCode()).toBe('100000');
     expect(component.postAddress()).toBe('Invalid post code');
   }));
