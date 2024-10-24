@@ -1,0 +1,11 @@
+<div>
+  <h1>住所検索</h1>
+  <div>
+    <input type="text" name="text" [(ngModel)]="postCode" autocomplete="off" />
+    <button (click)="onSearchAddress()">検索</button>
+  </div>
+  <div>
+    <label>住所: </label>
+    <span name="post_address">{{ postAddress() }}</span>
+  </div>
+</div>
